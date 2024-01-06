@@ -8,7 +8,6 @@ class BaseModel(models.Model):
     modified_date = models.DateField('Fecha de modificación', auto_now=True, auto_now_add=False)
     delete_date = models.DateField('Fecha de eliminación', auto_now=True, auto_now_add=False)
 
-
     class Meta:
         abstract = True
         verbose_name = 'BaseModel'

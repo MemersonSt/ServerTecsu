@@ -38,8 +38,9 @@ BASE_APPS = [
     'django.contrib.staticfiles',
 ]
 
-LOCAL_APPS = [
+SERVER_APPS = [
     'apps.Users',
+    'apps.inventory',
 ]
 
 THIRD_APPS = [
@@ -47,7 +48,7 @@ THIRD_APPS = [
     'rest_framework.authtoken'
 ]
 
-INSTALLED_APPS = BASE_APPS + LOCAL_APPS + THIRD_APPS
+INSTALLED_APPS = BASE_APPS + SERVER_APPS + THIRD_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -85,9 +86,17 @@ WSGI_APPLICATION = 'ServidorTecsu.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'bfunhmzjivqriniizxt8',
+        'USER': 'ucnz7kqepgimcm7s',
+        'PASSWORD': 'xXQzNoHbQZ0l1sTp0uir',
+        'HOST': 'bfunhmzjivqriniizxt8-mysql.services.clever-cloud.com',
+        'PORT': '3306'
     }
 }
 
