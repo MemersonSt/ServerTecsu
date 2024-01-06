@@ -40,7 +40,7 @@ BASE_APPS = [
 
 SERVER_APPS = [
     'apps.Users',
-    'apps.inventory',
+    'apps.products',
 ]
 
 THIRD_APPS = [

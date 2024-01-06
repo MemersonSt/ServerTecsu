@@ -48,3 +48,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f'{self.name} {self.last_name}'
+
+class UserSecretaria(User):
+    class Meta:
+        proxy = True
+        verbose_name = 'Secretaria'
+        verbose_name_plural = 'Secretarias'

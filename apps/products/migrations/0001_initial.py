@@ -60,8 +60,8 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(max_length=200)),
                 ('price', models.DecimalField(decimal_places=2, max_digits=10)),
                 ('stock', models.IntegerField()),
-                ('brand', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='inventory.brand')),
-                ('category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='inventory.category')),
+                ('brand', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='products.brand')),
+                ('category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='products.category')),
             ],
             options={
                 'verbose_name': 'BaseModel',
@@ -78,7 +78,7 @@ class Migration(migrations.Migration):
                 ('modified_date', models.DateField(auto_now=True, verbose_name='Fecha de modificación')),
                 ('delete_date', models.DateField(auto_now=True, verbose_name='Fecha de eliminación')),
                 ('total', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('client', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='inventory.estudents')),
+                ('client', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='products.estudents')),
             ],
             options={
                 'verbose_name': 'BaseModel',
@@ -96,8 +96,8 @@ class Migration(migrations.Migration):
                 ('delete_date', models.DateField(auto_now=True, verbose_name='Fecha de eliminación')),
                 ('quantity', models.IntegerField()),
                 ('subtotal', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='inventory.product')),
-                ('sale', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='inventory.sale')),
+                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='products.product')),
+                ('sale', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='products.sale')),
             ],
             options={
                 'verbose_name': 'BaseModel',
