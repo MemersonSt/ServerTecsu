@@ -30,7 +30,7 @@ class Estudents(models.Model):
     last_name = models.CharField(max_length=255)
     balance = models.DecimalField(max_digits=5, decimal_places=2)
     state = models.BooleanField(default=True)
-    object = CustomUserManager()
+    objects = CustomUserManager()
 
     def __str__(self):
         return f'{self.name} {self.last_name}'
