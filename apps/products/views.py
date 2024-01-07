@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
 from apps.products.models import Product
-from apps.products.api.serializers import ProductSerializer, CategorySerializer, BrandSerializer
+from apps.products.api.serializers import ProductSerializer
 
 
 class ProductViewSet(viewsets.ModelViewSet):

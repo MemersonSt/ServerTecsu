@@ -2,8 +2,8 @@ from rest_framework.generics import CreateAPIView, UpdateAPIView, DestroyAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status  # Documentacion code status
-from .models import Estudents
 from .serializers import UserCreateSerializer, UserTokenSerializer, EstudentsSerializer
+from .models import Estudents
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 
