@@ -11,7 +11,7 @@ class TransactionCreateView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         try:
             serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=False)
+            serializer.is_valid(raise_exception=False)  # maldita viana que por estar en True no me dejaba buscar y me daba error
 
             identidad = request.data['numero_identidad']
             code_student = request.data['code_student']
@@ -24,7 +24,6 @@ class TransactionCreateView(generics.CreateAPIView):
             user = User.objects.filter(numero_identidad=identidad).first()
             if not user:
                 return Response({"numero_identidad": ["Usuario no encontrado."]}, status=status.HTTP_400_BAD_REQUEST)
-
 
             balance = estudent.balance  # Obtener el balance del estudiante
             balance = float(balance)
