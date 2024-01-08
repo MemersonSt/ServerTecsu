@@ -9,7 +9,8 @@ class UserTokenSerializer(serializers.ModelSerializer):
             'username',
             'email',
             'name',
-            'last_name'
+            'last_name',
+            'numero_identidad',
         )
 
 
@@ -41,19 +42,9 @@ class UserListSerializer(serializers.ModelSerializer):
             'email',
             'password',
             'name',
+            'last_name',
+            'numero_identidad',
         )
-
-    # Una funcion que se llama para listar mostrando solo datos seleccionados en vez de todos
-    # def to_representation(self, instance):
-    #     #     return {
-    #     #         'id': instance['id'],  # se accede a la clave del valor con ['valor requerido']
-    #     #         # Se puede cambiar el username a usuario sin necesidad cambiar el original
-    #     #         'username': instance['username'],
-    #     #         'email': instance['email'],
-    #     #         'password': instance['password'],
-    #     #         'name': instance['name'],
-    #     #         'students': instance['students'],
-    #     #     }
 
 
 class EstudentsSerializer(serializers.ModelSerializer):

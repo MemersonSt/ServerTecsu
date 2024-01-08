@@ -6,5 +6,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('tecsu/', include('apps.Users.urls')),
     path('tecsu/', include('apps.products.api.routers')),
+    path('tecsu/', include('apps.transactions.urls')),
     path('docs/', include_docs_urls(title='API TEC-SU')),
 ]

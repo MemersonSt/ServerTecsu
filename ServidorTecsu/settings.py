@@ -41,6 +41,7 @@ BASE_APPS = [
 SERVER_APPS = [
     'apps.Users',
     'apps.products',
+    'apps.transactions',
 ]
 
 THIRD_APPS = [
