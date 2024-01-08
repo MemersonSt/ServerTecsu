@@ -41,7 +41,6 @@ class UserListSerializer(serializers.ModelSerializer):
             'email',
             'password',
             'name',
-            'students',
         )
 
     # Una funcion que se llama para listar mostrando solo datos seleccionados en vez de todos
@@ -60,9 +59,16 @@ class UserListSerializer(serializers.ModelSerializer):
 class EstudentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Estudents
-        fields = '__all__'
+        fields = (
+            'id',
+            'code_students',
+            'name',
+            'last_name',
+            'balance',
+            'Representative',
+        )
 
 
 class VincularSerializer(serializers.Serializer):
-    user_id = serializers.IntegerField()
-    estudent_id = serializers.IntegerField()
+    numero_identidad = serializers.CharField(max_length=20)
+    code_students = serializers.IntegerField()

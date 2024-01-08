@@ -6,6 +6,8 @@ from .serializers import UserCreateSerializer, UserTokenSerializer, UserListSeri
 from .models import Estudents, User
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
+from django.core.exceptions import ObjectDoesNotExist
+import logging
 
 
 # Create your views here.
@@ -40,10 +42,19 @@ class Login(ObtainAuthToken):
 
 class Logout(APIView):
     def post(self, request, *args, **kwargs):
-        token = Token.objects.filter(user=request.user).first()
-        if token:
-            token.delete()
-        return Response({'message': 'Sesión cerrada correctamente'}, status=status.HTTP_200_OK)
+        try:
+            if request.user.is_authenticated:
+                token = Token.objects.get(user=request.user)
+                token.delete()
+                return Response({'message': 'Sesión cerrada correctamente'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'message': 'Usuario no autenticado'}, status=status.HTTP_400_BAD_REQUEST)
+        except ObjectDoesNotExist as e:
+            logging.warning(f'Token no encontrado: {e}')
+            return Response({'message': 'Token no encontrado'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logging.error(f'Error al cerrar sesión: {e}')
+            return Response({'message': 'No se pudo cerrar la sesión'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserCreate(CreateAPIView):
@@ -159,17 +170,22 @@ class VincularEstudiante(CreateAPIView):
     serializer_class = VincularSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        serializer = self.get_serializer(data=request.data)  # Obtenemos los datos del request
+        serializer.is_valid(raise_exception=True)  # Validamos los datos
 
-        user_id = serializer.validated_data['user_id']
-        estudent_id = serializer.validated_data['estudent_id']
+        Identidad = serializer.validated_data['numero_identidad']  # Obtenemos el numero de identidad
+        code_students = serializer.validated_data['code_students']  # Obtenemos el codigo del estudiante
+        try:
+            #  user = User.objects.get(pk=user_id)  # Obtenemos el usuario
+            user = User.objects.filter(numero_identidad=Identidad).first()  # Obtenemos el usuario
+            estudent = Estudents.objects.filter(code_students=code_students).first()  # Obtenemos el estudiante
 
-        user = User.objects.get(pk=user_id)
-        estudent = Estudents.objects.get(pk=estudent_id)
-        user.students = estudent
+            estudent.Representative = user  # Asignamos el representante al estudiante
 
-        user.save()  # Me olvide de guardar el usuario XD
+            estudent.save()  # Me olvide de guardar el usuario XD
 
-        return Response({'message': 'Estudiante vinculado correctamente'}, status=status.HTTP_201_CREATED)
+            return Response({'message': 'Estudiante vinculado correctamente'}, status=status.HTTP_201_CREATED)
+
+        except:
+            return Response({'message': 'Error al vincular el estudiante'}, status=status.HTTP_400_BAD_REQUEST)
 
