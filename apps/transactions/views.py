@@ -3,8 +3,11 @@ from .serializers import TransactionSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Transaction, Estudents, User
+from django.contrib.auth.decorators import permission_required
+from django.utils.decorators import method_decorator
 
 
+@method_decorator(permission_required('transactions.add_transaction', raise_exception=True), name='dispatch')
 class TransactionCreateView(generics.CreateAPIView):
     serializer_class = TransactionSerializer
 
@@ -24,6 +27,10 @@ class TransactionCreateView(generics.CreateAPIView):
             user = User.objects.filter(numero_identidad=identidad).first()
             if not user:
                 return Response({"numero_identidad": ["Usuario no encontrado."]}, status=status.HTTP_400_BAD_REQUEST)
+
+            # validamos que el estudiante este asociado al usuario
+            if estudent.Representative != user:
+                return Response({"code_student": ["Estudiante no asociado al usuario."]}, status=status.HTTP_400_BAD_REQUEST)
 
             balance = estudent.balance  # Obtener el balance del estudiante
             balance = float(balance)

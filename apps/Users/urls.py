@@ -1,5 +1,18 @@
 from django.urls import path
-from .views import Login, Logout, UserCreate, UserList, UserUpdate, EstudentCreate, EstudentUpdate, EstudentDelete, EstudentList, VincularEstudiante, EstudentDetail, UserDetail
+from .views import (
+    Login,
+    Logout,
+    UserCreate,
+    UserList,
+    UserUpdate,
+    EstudentCreate,
+    EstudentUpdate,
+    EstudentDelete,
+    EstudentList,
+    VincularEstudiante,
+    EstudentDetail,
+    UserDetail,
+)
 
 urlpatterns = [
     # USUARIOS/PADRES DE FAMILIA
