@@ -2,7 +2,15 @@ from rest_framework.generics import CreateAPIView, UpdateAPIView, DestroyAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status  # Documentacion code status
-from .serializers import UserCreateSerializer, UserTokenSerializer, UserListSerializer, EstudentsSerializer, VincularSerializer
+from .serializers import (
+    UserCreateSerializer,
+    UserTokenSerializer,
+    UserListSerializer,
+    UserDetailSerializer,
+    EstudentsSerializer,
+    EstudentsDetailSerializer,
+    VincularSerializer,
+)
 from .models import Estudents, User
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -72,6 +80,23 @@ class UserCreate(CreateAPIView):
             return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class UserDetail(CreateAPIView):
+    serializer_class = UserDetailSerializer
+
+    def post(self, request, *args, **kwargs):
+        try:
+            serializer = self.serializer_class(data=request.data)  # Obtenemos los datos del request
+            serializer.is_valid(raise_exception=True)
+
+            numero_identidad = serializer.validated_data['numero_identidad']  # Obtenemos el numero de identidad
+
+            user = User.objects.filter(numero_identidad=numero_identidad).first()  # Obtenemos el usuario
+            user_serializer = UserCreateSerializer(user)
+            return Response(user_serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'message': 'No existe el usuario'}, status=status.HTTP_404_NOT_FOUND)
+
+
 class UserUpdate(UpdateAPIView):
     serializer_class = UserCreateSerializer
 
@@ -119,11 +144,30 @@ class EstudentCreate(CreateAPIView):
             return Response(estudent_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class EstudentDetail(CreateAPIView):
+    serializer_class = EstudentsDetailSerializer
+
+    def post(self, request, *args, **kwargs):
+        try:
+            serializer = self.serializer_class(data=request.data)  # Obtenemos los datos del request
+            serializer.is_valid(raise_exception=True)
+
+            code_students = serializer.validated_data['code_students']  # Obtenemos el codigo del estudiante
+
+
+            estudent = Estudents.objects.filter(code_students=code_students).first()  # Obtenemos el estudiante
+            print(estudent)
+            estudent_serializer = EstudentsSerializer(estudent)
+            return Response(estudent_serializer.data, status=status.HTTP_200_OK)
+        except Estudents.DoesNotExist:
+            return Response({'message': 'No existe el estudiante'}, status=status.HTTP_404_NOT_FOUND)
+
+
 class EstudentUpdate(UpdateAPIView):
     serializer_class = EstudentsSerializer
 
     def get_queryset(self):
-        return Estudents.objects.all()
+        return Estudents.objects.all()  # Obtenemos todos los estudiantes
 
     def put(self, request, *args, **kwargs):
         estudent = self.get_queryset().get(pk=kwargs['pk'])
