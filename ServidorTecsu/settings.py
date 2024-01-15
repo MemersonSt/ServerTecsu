@@ -42,7 +42,7 @@ SERVER_APPS = [
     'apps.Users',
     'apps.products',
     'apps.transactions',
-    'apps.shoppingCart',
+    # 'apps.buys',
 ]
 
 THIRD_APPS = [

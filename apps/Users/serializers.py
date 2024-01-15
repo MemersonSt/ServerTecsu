@@ -33,6 +33,10 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return user
 
 
+class UserDetailSerializer(serializers.Serializer):
+    numero_identidad = serializers.CharField(max_length=20)
+
+
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -58,6 +62,10 @@ class EstudentsSerializer(serializers.ModelSerializer):
             'balance',
             'Representative',
         )
+
+
+class EstudentsDetailSerializer(serializers.Serializer):
+    code_students = serializers.CharField(max_length=20)
 
 
 class VincularSerializer(serializers.Serializer):
