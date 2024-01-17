@@ -1,75 +1,54 @@
-# from rest_framework import generics, status
-# from rest_framework.response import Response
-# from .models import OrdenCompra, ItemOrdenCompra
-# from .serializers import OrdenCompraSerializer, ItemOrdenCompraSerializer
-#
-#
-# class OrdenCompraList(generics.ListCreateAPIView):
-#     queryset = OrdenCompra.objects.all()
-#     serializer_class = OrdenCompraSerializer
-#
-#     def post(self, request, *args, **kwargs):
-#         serializer = OrdenCompraSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response({'message': 'Error al crear la orden de compra'},
-#                         status=status.HTTP_400_BAD_REQUEST)
-#
-#     def get(self, request, *args, **kwargs):
-#         orden_compra = OrdenCompra.objects.all()
-#         serializer = OrdenCompraSerializer(orden_compra, many=True)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-#
-#
-# class OrdenCompraDetail(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = OrdenCompra.objects.all()
-#     serializer_class = OrdenCompraSerializer
-#
-#     def get(self, request, *args, **kwargs):
-#         try:
-#             orden_compra = OrdenCompra.objects.get(id_shopping=kwargs['pk'])
-#             serializer = OrdenCompraSerializer(orden_compra)
-#             return Response(serializer.data, status=status.HTTP_200_OK)
-#         except OrdenCompra.DoesNotExist:
-#             return Response({'message': 'No existe la orden de compra'},
-#                             status=status.HTTP_404_NOT_FOUND)
-#
-#     def put(self, request, *args, **kwargs):
-#         try:
-#             orden_compra = OrdenCompra.objects.get(id_shopping=kwargs['pk'])
-#             serializer = OrdenCompraSerializer(orden_compra, data=request.data)
-#             if serializer.is_valid():
-#                 serializer.save()
-#                 return Response(serializer.data, status=status.HTTP_200_OK)
-#         except OrdenCompra.DoesNotExist:
-#             return Response({'message': 'No existe la orden de compra'},
-#                             status=status.HTTP_404_NOT_FOUND)
-#
-#     def delete(self, request, *args, **kwargs):
-#         try:
-#             orden_compra = OrdenCompra.objects.get(id_shopping=kwargs['pk'])
-#             orden_compra.delete()
-#             return Response({'message': 'Orden de compra eliminada'},
-#                             status=status.HTTP_200_OK)
-#         except OrdenCompra.DoesNotExist:
-#             return Response({'message': 'No existe la orden de compra'},
-#                             status=status.HTTP_404_NOT_FOUND)
-#
-#
-# class ItemOrdenCompraList(generics.ListCreateAPIView):
-#     queryset = ItemOrdenCompra.objects.all()
-#     serializer_class = ItemOrdenCompraSerializer
-#
-#     def post(self, request, *args, **kwargs):
-#         serializer = ItemOrdenCompraSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response({'message': 'Error al crear el item de la orden de compra'},
-#                         status=status.HTTP_400_BAD_REQUEST)
-#
-#     def get(self, request, *args, **kwargs):
-#         item_orden_compra = ItemOrdenCompra.objects.all()
-#         serializer = ItemOrdenCompraSerializer(item_orden_compra, many=True)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
+from rest_framework import generics, status
+from rest_framework.response import Response
+from rest_framework.parsers import JSONParser
+from .models import OrdenCompra, ItemOrdenCompra
+from apps.Users.models import Estudents
+from .serializers import CompraSerializer
+
+
+class ProcesarCompra(generics.CreateAPIView):
+    queryset = OrdenCompra.objects.all()
+    serializer_class = CompraSerializer
+
+    def post(self, request, *args, **kwargs):
+        data = JSONParser().parse(request)  # Convertir el JSON a un diccionario de Python
+        serializer = CompraSerializer(data=data)  # Convertir el diccionario de Python a un objeto de tipo CompraSerializer
+
+        if serializer.is_valid(): # Validar el objeto de tipo CompraSerializer
+            # Obtenemos el codigo del estudiante
+            codigo = serializer.validated_data['code_students']
+            verificar = Estudents.objects.filter(code_students=codigo).exists()
+            if verificar:
+                # Obtenemos el id de la orden de compra
+                id_orden_compra = serializer.validated_data['id_shopping']
+
+                # Obtenemos el total de la orden de compra
+                total = serializer.validated_data['total']
+
+                # Creamos la orden de compra
+                orden_compra = OrdenCompra.objects.create(id_shopping=id_orden_compra, code_students=codigo, total=total)
+                productos = serializer.validated_data['product_detail']
+                for producto_data in productos:
+                    producto = ItemOrdenCompra.objects.create(
+                        products=producto_data['products'],
+                        quantity=producto_data['quantity'],
+                        total=producto_data['total']
+                    )
+
+                    # Asignamos la orden de compra al item de orden compra
+                    producto.orden_compra = orden_compra
+                    producto.save()
+
+                return Response({"message": "Orden de compra creada"}, status=status.HTTP_201_CREATED)
+
+            else:
+                return Response({"message": "El estudiante no existe"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def calcular_total(productos):
+    total = 0
+    for producto in productos:
+        total += producto['total']
+    return total
+
