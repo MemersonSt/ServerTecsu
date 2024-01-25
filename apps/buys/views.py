@@ -1,13 +1,13 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
-from .models import OrdenCompra, ItemOrdenCompra
-from apps.Users.models import Estudents
+from .models import ListaCompra, ItemCompra
+from apps.Users.models import Students
 from .serializers import CompraSerializer
 
 
 class ProcesarCompra(generics.CreateAPIView):
-    queryset = OrdenCompra.objects.all()
+    queryset = ListaCompra.objects.all()
     serializer_class = CompraSerializer
 
     def post(self, request, *args, **kwargs):
@@ -17,7 +17,7 @@ class ProcesarCompra(generics.CreateAPIView):
         if serializer.is_valid(): # Validar el objeto de tipo CompraSerializer
             # Obtenemos el codigo del estudiante
             codigo = serializer.validated_data['code_students']
-            verificar = Estudents.objects.filter(code_students=codigo).exists()
+            verificar = Students.objects.filter(code_students=codigo).exists()
             if verificar:
                 # Obtenemos el id de la orden de compra
                 id_orden_compra = serializer.validated_data['id_shopping']
@@ -26,10 +26,10 @@ class ProcesarCompra(generics.CreateAPIView):
                 total = serializer.validated_data['total']
 
                 # Creamos la orden de compra
-                orden_compra = OrdenCompra.objects.create(id_shopping=id_orden_compra, code_students=codigo, total=total)
+                orden_compra = ListaCompra.objects.create(id_shopping=id_orden_compra, code_students=codigo, total=total)
                 productos = serializer.validated_data['product_detail']
                 for producto_data in productos:
-                    producto = ItemOrdenCompra.objects.create(
+                    producto = ItemCompra.objects.create(
                         products=producto_data['products'],
                         quantity=producto_data['quantity'],
                         total=producto_data['total']

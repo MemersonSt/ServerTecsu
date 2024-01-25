@@ -39,8 +39,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     user_permissions = models.ManyToManyField('auth.Permission', related_name='custom_user_permissions')
 
     class Meta:
-        verbose_name = 'Usuario'
-        verbose_name_plural = 'Usuarios'
+        verbose_name = 'REPRESENTANTE'
+        verbose_name_plural = 'REPRESENTANTES'
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email', 'name', 'last_name']
@@ -49,11 +49,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         return f'{self.name} {self.last_name}'
 
 
-class Estudents(models.Model):
-    code_students = models.CharField(max_length=255)
+class Students(models.Model):
+    cedula = models.CharField(max_length=255)
+    uid = models.CharField(max_length=255, blank=True, null=True)
     name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    balance = models.DecimalField(max_digits=5, decimal_places=2)
+    balance = models.FloatField(default=0)
     Representative = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     state = models.BooleanField(default=True)
     objects = CustomUserManager()
@@ -61,3 +62,21 @@ class Estudents(models.Model):
     def __str__(self):
         return f'{self.name} {self.last_name}'
 
+    class Meta:
+        verbose_name = 'ESTUDIANTE'
+        verbose_name_plural = 'ESTUDIANTES'
+
+
+class Secretary(models.Model):
+    cedula = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    state = models.BooleanField(default=True)
+    objects = CustomUserManager()
+
+    def __str__(self):
+        return f'{self.name} {self.last_name}'
+
+    class Meta:
+        verbose_name = 'SECRETARIA'
+        verbose_name_plural = 'SECRETARIAS'

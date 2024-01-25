@@ -11,7 +11,7 @@ from .serializers import (
     EstudentsDetailSerializer,
     VincularSerializer,
 )
-from .models import Estudents, User
+from .models import Students, User
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from django.core.exceptions import ObjectDoesNotExist
@@ -27,7 +27,9 @@ class Login(ObtainAuthToken):
             user = login_serializer.validated_data['user']
             if user.is_active:
                 token, created = Token.objects.get_or_create(user=user)
+                # print(user.students_set.all())
                 user_serializer = UserTokenSerializer(user)
+                # print(user_serializer.data.get('students'))
                 if created:
                     return Response({
                         'token': token.key,
@@ -46,7 +48,6 @@ class Login(ObtainAuthToken):
                 return Response({'message': 'Usuario no activo'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
             return Response({'message': 'Usuario o contraseña incorrectos'}, status=status.HTTP_400_BAD_REQUEST)
-
 
 class Logout(APIView):
     def post(self, request, *args, **kwargs):
@@ -155,11 +156,11 @@ class EstudentDetail(CreateAPIView):
             code_students = serializer.validated_data['code_students']  # Obtenemos el codigo del estudiante
 
 
-            estudent = Estudents.objects.filter(code_students=code_students).first()  # Obtenemos el estudiante
+            estudent = Students.objects.filter(code_students=code_students).first()  # Obtenemos el estudiante
             print(estudent)
             estudent_serializer = EstudentsSerializer(estudent)
             return Response(estudent_serializer.data, status=status.HTTP_200_OK)
-        except Estudents.DoesNotExist:
+        except Students.DoesNotExist:
             return Response({'message': 'No existe el estudiante'}, status=status.HTTP_404_NOT_FOUND)
 
 
@@ -167,7 +168,7 @@ class EstudentUpdate(UpdateAPIView):
     serializer_class = EstudentsSerializer
 
     def get_queryset(self):
-        return Estudents.objects.all()  # Obtenemos todos los estudiantes
+        return Students.objects.all()  # Obtenemos todos los estudiantes
 
     def put(self, request, *args, **kwargs):
         estudent = self.get_queryset().get(pk=kwargs['pk'])
@@ -186,7 +187,7 @@ class EstudentDelete(DestroyAPIView):
     serializer_class = EstudentsSerializer
 
     def get_queryset(self):
-        return Estudents.objects.all()
+        return Students.objects.all()
 
     def delete(self, request, *args, **kwargs):
         estudent = self.get_queryset().get(pk=kwargs['pk'])
@@ -201,7 +202,7 @@ class EstudentList(ListAPIView):
     serializer_class = EstudentsSerializer
 
     def get_queryset(self):
-        return Estudents.objects.all()
+        return Students.objects.all()
 
     def get(self, request, *args, **kwargs):
         estudents = self.get_queryset()
@@ -222,9 +223,9 @@ class VincularEstudiante(CreateAPIView):
         try:
             #  user = User.objects.get(pk=user_id)  # Obtenemos el usuario
             user = User.objects.filter(numero_identidad=Identidad).first()  # Obtenemos el usuario
-            estudent = Estudents.objects.filter(code_students=code_students).first()  # Obtenemos el estudiante
+            estudent = Students.objects.filter(code_students=code_students).first()  # Obtenemos el estudiante
 
-            estudent.Representative = user  # Asignamos el representante al estudiante
+            estudent.User = user  # Asignamos el representante al estudiante
 
             estudent.save()  # Me olvide de guardar el usuario XD
 

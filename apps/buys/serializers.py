@@ -1,10 +1,10 @@
 from rest_framework import serializers
-from .models import OrdenCompra, ItemOrdenCompra
+from .models import ListaCompra, ItemCompra
 
 
 class OrdenCompraSerializer(serializers.ModelSerializer):
     class Meta:
-        model = OrdenCompra
+        model = ListaCompra
         fields = (
             'id_shopping',
             'code_students',
@@ -14,7 +14,7 @@ class OrdenCompraSerializer(serializers.ModelSerializer):
 
 class ItemOrdenCompraSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ItemOrdenCompra
+        model = ItemCompra
         fields = '__all__'
 
 

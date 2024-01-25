@@ -1,16 +1,33 @@
 from rest_framework import serializers
-from .models import User, Estudents
+from .models import User, Students
 
+
+class EstudentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Students
+        fields = (
+            'id',
+            'cedula',
+            'uid',
+            'name',
+            'last_name',
+            'balance',
+            'Representative',
+        )
 
 class UserTokenSerializer(serializers.ModelSerializer):
+    students = EstudentsSerializer( source='students_set',many=True, read_only=True)
+
     class Meta:
         model = User
         fields = (
+            'id',
             'username',
             'email',
             'name',
             'last_name',
             'numero_identidad',
+            'students',
         )
 
 
@@ -48,19 +65,6 @@ class UserListSerializer(serializers.ModelSerializer):
             'name',
             'last_name',
             'numero_identidad',
-        )
-
-
-class EstudentsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Estudents
-        fields = (
-            'id',
-            'code_students',
-            'name',
-            'last_name',
-            'balance',
-            'Representative',
         )
 
 
