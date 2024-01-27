@@ -5,7 +5,7 @@ from apps.base.models import BaseModel
 # Create your models here.
 class Product(BaseModel):
     name = models.CharField(max_length=50)
-    image = models.ImageField(upload_to='products/', null=True, blank=True)
+    image = models.CharField(max_length=200)
     description = models.CharField(max_length=200)
     category = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)

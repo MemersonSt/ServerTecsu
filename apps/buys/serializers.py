@@ -7,7 +7,7 @@ class OrdenCompraSerializer(serializers.ModelSerializer):
         model = ListaCompra
         fields = (
             'id_shopping',
-            'code_students',
+            'uid',
             'total',
         )
 
@@ -19,8 +19,7 @@ class ItemOrdenCompraSerializer(serializers.ModelSerializer):
 
 
 class CompraSerializer(serializers.Serializer):
-    id_shopping = serializers.IntegerField()
-    code_students = serializers.CharField(max_length=50)
+    uid = serializers.CharField(max_length=50)
     product_detail = ItemOrdenCompraSerializer(many=True)
     total = serializers.DecimalField(max_digits=10, decimal_places=2)
 

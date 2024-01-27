@@ -3,11 +3,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status  # Documentacion code status
 from .serializers import (
-    UserCreateSerializer,
+    UserSerializer,
     UserTokenSerializer,
     UserListSerializer,
     UserDetailSerializer,
-    EstudentsSerializer,
+    StudentsSerializer,
     EstudentsDetailSerializer,
     VincularSerializer,
 )
@@ -27,9 +27,7 @@ class Login(ObtainAuthToken):
             user = login_serializer.validated_data['user']
             if user.is_active:
                 token, created = Token.objects.get_or_create(user=user)
-                # print(user.students_set.all())
                 user_serializer = UserTokenSerializer(user)
-                # print(user_serializer.data.get('students'))
                 if created:
                     return Response({
                         'token': token.key,
@@ -65,20 +63,24 @@ class Logout(APIView):
             logging.error(f'Error al cerrar sesión: {e}')
             return Response({'message': 'No se pudo cerrar la sesión'}, status=status.HTTP_400_BAD_REQUEST)
 
-
+# CREACION DE USUARIO
 class UserCreate(CreateAPIView):
-    serializer_class = UserCreateSerializer
+    serializer_class = UserSerializer
 
     def post(self, request, *args, **kwargs):
-        user_serializer = self.serializer_class(data=request.data)
-        if user_serializer.is_valid():
-            user_serializer.save()
-            return Response({
-                'message': 'Usuario creado correctamente',
-                'user': user_serializer.data
-            }, status=status.HTTP_201_CREATED)
-        else:
-            return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user_serializer = self.serializer_class(data=request.data)
+            if user_serializer.is_valid():
+                user_serializer.save()
+                return Response({
+                    'message': 'Usuario creado correctamente',
+                    'user': user_serializer.data
+                }, status=status.HTTP_201_CREATED)
+            else:
+                return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'message': 'Error al crear el usuario', 'error': f'{e}'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserDetail(CreateAPIView):
@@ -92,14 +94,14 @@ class UserDetail(CreateAPIView):
             numero_identidad = serializer.validated_data['numero_identidad']  # Obtenemos el numero de identidad
 
             user = User.objects.filter(numero_identidad=numero_identidad).first()  # Obtenemos el usuario
-            user_serializer = UserCreateSerializer(user)
+            user_serializer = UserSerializer(user)
             return Response(user_serializer.data, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({'message': 'No existe el usuario'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class UserUpdate(UpdateAPIView):
-    serializer_class = UserCreateSerializer
+    serializer_class = UserSerializer
 
     def get_queryset(self):
         return User.objects.all()
@@ -131,7 +133,7 @@ class UserList(ListAPIView):
 
 # ESTUDIANTE
 class EstudentCreate(CreateAPIView):
-    serializer_class = EstudentsSerializer
+    serializer_class = StudentsSerializer
 
     def post(self, request, *args, **kwargs):
         estudent_serializer = self.serializer_class(data=request.data)
@@ -153,22 +155,20 @@ class EstudentDetail(CreateAPIView):
             serializer = self.serializer_class(data=request.data)  # Obtenemos los datos del request
             serializer.is_valid(raise_exception=True)
 
-            code_students = serializer.validated_data['code_students']  # Obtenemos el codigo del estudiante
+            code_students = serializer.validated_data['cedula_estudiante']  # Obtenemos el codigo del estudiante
 
-
-            estudent = Students.objects.filter(code_students=code_students).first()  # Obtenemos el estudiante
-            print(estudent)
-            estudent_serializer = EstudentsSerializer(estudent)
+            estudent = Students.objects.filter(cedula_estudiante=code_students).first()  # Obtenemos el estudiante
+            estudent_serializer = StudentsSerializer(estudent)
             return Response(estudent_serializer.data, status=status.HTTP_200_OK)
         except Students.DoesNotExist:
             return Response({'message': 'No existe el estudiante'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class EstudentUpdate(UpdateAPIView):
-    serializer_class = EstudentsSerializer
+    serializer_class = StudentsSerializer
 
     def get_queryset(self):
-        return Students.objects.all()  # Obtenemos todos los estudiantes
+        return Students.objects.all()
 
     def put(self, request, *args, **kwargs):
         estudent = self.get_queryset().get(pk=kwargs['pk'])
@@ -184,30 +184,38 @@ class EstudentUpdate(UpdateAPIView):
 
 
 class EstudentDelete(DestroyAPIView):
-    serializer_class = EstudentsSerializer
+    serializer_class = StudentsSerializer
 
     def get_queryset(self):
         return Students.objects.all()
 
     def delete(self, request, *args, **kwargs):
-        estudent = self.get_queryset().get(pk=kwargs['pk'])
-        if estudent:
-            estudent.delete()
-            return Response({'message': 'Estudiante eliminado correctamente'}, status=status.HTTP_200_OK)
-        else:
-            return Response({'message': 'Estudiante no encontrado'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            estudent = self.get_queryset().get(pk=kwargs['pk'])
+            if estudent:
+                estudent.delete()
+                return Response({'message': 'Estudiante eliminado correctamente'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'message': 'Estudiante no encontrado'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'message': 'Error al eliminar el estudiante', 'error': f'{e}'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class EstudentList(ListAPIView):
-    serializer_class = EstudentsSerializer
+    serializer_class = StudentsSerializer
 
     def get_queryset(self):
         return Students.objects.all()
 
     def get(self, request, *args, **kwargs):
-        estudents = self.get_queryset()
-        estudents_serializer = self.serializer_class(estudents, many=True)
-        return Response(estudents_serializer.data, status=status.HTTP_200_OK)
+        try:
+            estudents = self.get_queryset()
+            estudents_serializer = self.serializer_class(estudents, many=True)
+            return Response(estudents_serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'message': f'Error al listar los estudiantes', 'error': f'{e}'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 # Vincular estudiante a usuario ManyToMany
@@ -218,12 +226,12 @@ class VincularEstudiante(CreateAPIView):
         serializer = self.get_serializer(data=request.data)  # Obtenemos los datos del request
         serializer.is_valid(raise_exception=True)  # Validamos los datos
 
-        Identidad = serializer.validated_data['numero_identidad']  # Obtenemos el numero de identidad
-        code_students = serializer.validated_data['code_students']  # Obtenemos el codigo del estudiante
+        identidad_representante = serializer.validated_data['numero_identidad']  # Obtenemos el numero de identidad
+        identidad_estudiante = serializer.validated_data['cedula_estudiante']  # Obtenemos el codigo del estudiante
         try:
             #  user = User.objects.get(pk=user_id)  # Obtenemos el usuario
-            user = User.objects.filter(numero_identidad=Identidad).first()  # Obtenemos el usuario
-            estudent = Students.objects.filter(code_students=code_students).first()  # Obtenemos el estudiante
+            user = User.objects.filter(numero_identidad=identidad_representante).first()  # Obtenemos el usuario
+            estudent = Students.objects.filter(cedula_estudiante=identidad_estudiante).first()  # Obtenemos el estudiante
 
             estudent.User = user  # Asignamos el representante al estudiante
 

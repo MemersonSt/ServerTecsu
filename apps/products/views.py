@@ -10,28 +10,39 @@ class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer = ProductSerializer(data=request.data)
-        if serializer.is_valid():
-            product = serializer.save()
-            data = ProductSerializer(product).data
-            return Response(data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            serializer = ProductSerializer(data=request.data)
+            if serializer.is_valid():
+                product = serializer.save()
+                data = ProductSerializer(product).data
+                return Response(data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"message": f"Error al crear el producto", "error":f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, *args, **kwargs):
-        product = self.get_object()
-        serializer = ProductSerializer(product, data=request.data)
-        if serializer.is_valid():
-            product = serializer.save()
-            data = ProductSerializer(product).data
-            return Response(data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            product = self.get_object()
+            serializer = ProductSerializer(product, data=request.data)
+            if serializer.is_valid():
+                product = serializer.save()
+                data = ProductSerializer(product).data
+                return Response(data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message": f"Error al actualizar el producto", "error":f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
-        product = self.get_object()
-        product.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            product = self.get_object()
+            product.state = False
+            product.save()
+            return Response({"message": "Producto eliminado"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message": f"Error al eliminar el producto", "error":f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
     def list(self, request, *args, **kwargs):
-        queryset = Product.objects.all()
-        serializer = ProductSerializer(queryset, many=True)
-        return Response(serializer.data)
+        try:
+            queryset = Product.objects.all()
+            serializer = ProductSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message": f"Error al listar los productos", "error":f'{e}'}, status=status.HTTP_400_BAD_REQUEST)

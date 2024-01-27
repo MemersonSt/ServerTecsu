@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin, AbstractUser
 
 
 class CustomUserManager(BaseUserManager):
@@ -23,12 +23,15 @@ class CustomUserManager(BaseUserManager):
     def create_superuser(self, username, email, name, last_name, password=None, **extra_fields):
         return self._create_user(username, email, name, last_name, password, True, True, **extra_fields)
 
+    def create_storeuser(self, username, email, name, last_name, password=None, **extra_fields):
+        return self._create_user(username, email, name, last_name, password, True, False, **extra_fields)
+
 
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(max_length=255, unique=True)
+    username = models.CharField(max_length=50, unique=True)
     email = models.EmailField('Correo Electrónico', max_length=255, unique=True, )
-    name = models.CharField('Nombres', max_length=255, blank=True, null=True)
-    last_name = models.CharField('Apellidos', max_length=255, blank=True, null=True)
+    name = models.CharField('Nombres', max_length=50, blank=True, null=True)
+    last_name = models.CharField('Apellidos', max_length=50, blank=True, null=True)
     image = models.ImageField('Imagen de perfil', upload_to='perfil/', max_length=255, null=True, blank=True)
     numero_identidad = models.CharField('Número de identidad', max_length=20, blank=False, null=False, unique=True)
     is_active = models.BooleanField(default=True)
@@ -50,10 +53,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Students(models.Model):
-    cedula = models.CharField(max_length=255)
+    cedula_estudiante = models.CharField(max_length=20)
     uid = models.CharField(max_length=255, blank=True, null=True)
-    name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
     balance = models.FloatField(default=0)
     Representative = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     state = models.BooleanField(default=True)
@@ -66,17 +69,3 @@ class Students(models.Model):
         verbose_name = 'ESTUDIANTE'
         verbose_name_plural = 'ESTUDIANTES'
 
-
-class Secretary(models.Model):
-    cedula = models.CharField(max_length=255)
-    name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    state = models.BooleanField(default=True)
-    objects = CustomUserManager()
-
-    def __str__(self):
-        return f'{self.name} {self.last_name}'
-
-    class Meta:
-        verbose_name = 'SECRETARIA'
-        verbose_name_plural = 'SECRETARIAS'

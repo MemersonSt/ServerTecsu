@@ -22,6 +22,7 @@ urlpatterns = [
     path('user/search/', UserDetail.as_view(), name = 'user_search'),
     path('user/update/<int:pk>/', UserUpdate.as_view(), name = 'user_update'),
     path('user/list/', UserList.as_view(), name = 'user_list'),
+
     # ESTUDIANTES
     path('estudent/create/', EstudentCreate.as_view(), name = 'estudent_create'),
     path('estudent/update/', EstudentUpdate.as_view(), name = 'estudent_update'),

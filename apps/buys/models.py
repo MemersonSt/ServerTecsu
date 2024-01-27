@@ -3,8 +3,8 @@ from apps.products.models import Product
 
 
 class ListaCompra(models.Model):
-    id_shopping = models.IntegerField(primary_key=True, unique=True)
-    code_students = models.CharField(max_length=50)
+    id_shopping = models.AutoField(primary_key=True)
+    uid = models.CharField(max_length=50)
     total = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateField(auto_now_add=True)
 
