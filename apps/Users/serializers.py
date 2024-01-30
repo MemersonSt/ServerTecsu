@@ -27,6 +27,8 @@ class StudentsSerializer(serializers.ModelSerializer):
         if data['uid'] == Students.uid:
             raise serializers.ValidationError('El uid del estudiante ya existe')
 
+        return data
+
 class UserTokenSerializer(serializers.ModelSerializer):
     students = StudentsSerializer(source='students_set', many=True, read_only=True)
 
@@ -68,6 +70,8 @@ class UserSerializer(serializers.ModelSerializer):
         if data['numero_identidad'] == User.numero_identidad:
             raise serializers.ValidationError('El número de identidad ya existe')
 
+        return data
+
 
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -88,9 +92,18 @@ class UserListSerializer(serializers.ModelSerializer):
 class UserDetailSerializer(serializers.Serializer):
     numero_identidad = serializers.CharField(max_length=20)
 
+    def validate(self, data):
+        if data['numero_identidad'] == '':
+            raise serializers.ValidationError('El número de identidad es requerido')
+        return data
+
 class EstudentsDetailSerializer(serializers.Serializer):
     cedula_estudiante = serializers.CharField(max_length=20)
 
+    def validate(self, data):
+        if data['cedula_estudiante'] == '':
+            raise serializers.ValidationError('La cédula del estudiante es requerida')
+        return data
 
 
 # VINCULAR
