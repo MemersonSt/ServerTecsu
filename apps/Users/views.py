@@ -94,10 +94,14 @@ class UserDetail(CreateAPIView):
             numero_identidad = serializer.validated_data['numero_identidad']  # Obtenemos el numero de identidad
 
             user = User.objects.filter(numero_identidad=numero_identidad).first()  # Obtenemos el usuario
-            user_serializer = UserSerializer(user)
-            return Response(user_serializer.data, status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            return Response({'message': 'No existe el usuario'}, status=status.HTTP_404_NOT_FOUND)
+            if user:
+                user_serializer = UserSerializer(user)
+                return Response(user_serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({'message': 'No existe el usuario'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'message': 'Error al obtener el usuario', 'error': f'{e}'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserUpdate(UpdateAPIView):
@@ -107,16 +111,20 @@ class UserUpdate(UpdateAPIView):
         return User.objects.all()
 
     def put(self, request, *args, **kwargs):
-        user = self.get_queryset().get(pk=kwargs['pk'])
-        if user:
-            user_serializer = self.serializer_class(user, data=request.data)
-            if user_serializer.is_valid():
-                user_serializer.save()
-                return Response(user_serializer.data, status=status.HTTP_200_OK)
+        try:
+            user = self.get_queryset().get(pk=kwargs['pk'])
+            if user:
+                user_serializer = self.serializer_class(user, data=request.data)
+                if user_serializer.is_valid():
+                    user_serializer.save()
+                    return Response(user_serializer.data, status=status.HTTP_200_OK)
+                else:
+                    return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             else:
-                return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'message': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'message': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'message': 'Error al actualizar el usuario', 'error': f'{e}'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserList(ListAPIView):
@@ -126,9 +134,12 @@ class UserList(ListAPIView):
         return User.objects.all()
 
     def get(self, request, *args, **kwargs):
-        users = self.get_queryset()
-        users_serializer = self.serializer_class(users, many=True)
-        return Response(users_serializer.data, status=status.HTTP_200_OK)
+        try:
+            users = self.get_queryset()
+            users_serializer = self.serializer_class(users, many=True)
+            return Response(users_serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'message': f'Error al listar los usuarios', 'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # ESTUDIANTE
@@ -136,15 +147,19 @@ class EstudentCreate(CreateAPIView):
     serializer_class = StudentsSerializer
 
     def post(self, request, *args, **kwargs):
-        estudent_serializer = self.serializer_class(data=request.data)
-        if estudent_serializer.is_valid():
-            estudent_serializer.save()
-            return Response({
-                'message': 'Estudiante creado correctamente',
-                'estudent': estudent_serializer.data
-            }, status=status.HTTP_201_CREATED)
-        else:
-            return Response(estudent_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            estudent_serializer = self.serializer_class(data=request.data)
+            if estudent_serializer.is_valid():
+                estudent_serializer.save()
+                return Response({
+                    'message': 'Estudiante creado correctamente',
+                    'estudent': estudent_serializer.data
+                }, status=status.HTTP_201_CREATED)
+            else:
+                return Response(estudent_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'message': 'Error al crear el estudiante', 'error': f'{e}'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class EstudentDetail(CreateAPIView):
@@ -158,10 +173,15 @@ class EstudentDetail(CreateAPIView):
             code_students = serializer.validated_data['cedula_estudiante']  # Obtenemos el codigo del estudiante
 
             estudent = Students.objects.filter(cedula_estudiante=code_students).first()  # Obtenemos el estudiante
-            estudent_serializer = StudentsSerializer(estudent)
-            return Response(estudent_serializer.data, status=status.HTTP_200_OK)
-        except Students.DoesNotExist:
-            return Response({'message': 'No existe el estudiante'}, status=status.HTTP_404_NOT_FOUND)
+            if estudent:
+                estudent_serializer = StudentsSerializer(estudent)
+                return Response(estudent_serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({'message': 'No existe el estudiante'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'message': 'Error al obtener el estudiante', 'error': f'{e}'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class EstudentUpdate(UpdateAPIView):
