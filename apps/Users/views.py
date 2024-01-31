@@ -252,9 +252,7 @@ class VincularEstudiante(CreateAPIView):
             #  user = User.objects.get(pk=user_id)  # Obtenemos el usuario
             user = User.objects.filter(numero_identidad=identidad_representante).first()  # Obtenemos el usuario
             estudent = Students.objects.filter(cedula_estudiante=identidad_estudiante).first()  # Obtenemos el estudiante
-
-            estudent.User = user  # Asignamos el representante al estudiante
-
+            estudent.Representative = user  # Asignamos el representante al estudiante
             estudent.save()  # Me olvide de guardar el usuario XD
 
             return Response({'message': 'Estudiante vinculado correctamente'}, status=status.HTTP_201_CREATED)
