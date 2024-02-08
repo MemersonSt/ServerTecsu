@@ -53,12 +53,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Students(models.Model):
-    cedula_estudiante = models.CharField(max_length=20)
-    uid = models.CharField(max_length=255, blank=True, null=True)
+    cedula_estudiante = models.CharField(max_length=20, unique=True)
+    uid = models.CharField(max_length=255, blank=True, null=True, unique=True)
     name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     balance = models.FloatField(default=0)
-    Representative = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    Representative = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, to_field='numero_identidad')
     state = models.BooleanField(default=True)
     objects = CustomUserManager()
 

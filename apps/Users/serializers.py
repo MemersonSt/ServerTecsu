@@ -22,8 +22,6 @@ class StudentsSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('El nombre del estudiante es requerido')
         if data['last_name'] == '':
             raise serializers.ValidationError('El apellido del estudiante es requerido')
-        if data['cedula_estudiante'] == Students.cedula_estudiante:
-            raise serializers.ValidationError('La cédula del estudiante ya existe')
         if data['uid'] == Students.uid:
             raise serializers.ValidationError('El uid del estudiante ya existe')
 
