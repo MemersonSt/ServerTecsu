@@ -37,6 +37,7 @@ class UserTokenSerializer(serializers.ModelSerializer):
             'username',
             'email',
             'name',
+            'number_phone',
             'last_name',
             'students',
         )
@@ -79,6 +80,7 @@ class UserListSerializer(serializers.ModelSerializer):
             'username',
             'email',
             'numero_identidad',
+            'number_phone',
             'password',
             'name',
             'last_name',
