@@ -4,6 +4,7 @@ from .views import (
     Logout,
     UserCreate,
     UserList,
+    UserListStudents,
     UserUpdate,
     EstudentCreate,
     EstudentUpdate,
@@ -22,6 +23,7 @@ urlpatterns = [
     path('user/search/', UserDetail.as_view(), name = 'user_search'),
     path('user/update/<int:pk>/', UserUpdate.as_view(), name = 'user_update'),
     path('user/list/', UserList.as_view(), name = 'user_list'),
+    path('user/list/students/<str:cedula_representante>', UserListStudents.as_view(), name = 'user_list_students'),
 
     # ESTUDIANTES
     path('estudent/create/', EstudentCreate.as_view(), name = 'estudent_create'),

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import User, Students
+from apps.buys.models import ListaCompra, ItemCompra, Product
 
 # ESTUDIANTE
 class StudentsSerializer(serializers.ModelSerializer):
@@ -27,6 +28,7 @@ class StudentsSerializer(serializers.ModelSerializer):
 
         return data
 
+
 class UserTokenSerializer(serializers.ModelSerializer):
     students = StudentsSerializer(source='students_set', many=True, read_only=True)
 
@@ -37,6 +39,7 @@ class UserTokenSerializer(serializers.ModelSerializer):
             'username',
             'email',
             'name',
+            'numero_identidad',
             'number_phone',
             'last_name',
             'students',
@@ -84,6 +87,20 @@ class UserListSerializer(serializers.ModelSerializer):
             'password',
             'name',
             'last_name',
+        )
+
+
+class UserListStudentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Students
+        fields = (
+            'id',
+            'cedula_estudiante',
+            'uid',
+            'name',
+            'last_name',
+            'balance',
+            'Representative',
         )
 
 

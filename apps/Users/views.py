@@ -6,6 +6,7 @@ from .serializers import (
     UserSerializer,
     UserTokenSerializer,
     UserListSerializer,
+    UserListStudentsSerializer,
     UserDetailSerializer,
     StudentsSerializer,
     EstudentsDetailSerializer,
@@ -140,6 +141,24 @@ class UserList(ListAPIView):
             return Response(users_serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'message': f'Error al listar los usuarios', 'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserListStudents(ListAPIView):
+    serializer_class = UserListStudentsSerializer
+
+    def get_queryset(self):
+        cedula_representante = self.kwargs['cedula_representante']
+        return Students.objects.filter(Representative=cedula_representante)
+
+    def list(self, request, *args, **kwargs):
+        try:
+            queryset = self.get_queryset()
+            serializer = self.serializer_class(queryset, many=True)
+            serializer_data = [dict(data) for data in serializer.data]
+
+            return Response(serializer_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'message': f'Error al listar los estudiantes', 'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # ESTUDIANTE
