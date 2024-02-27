@@ -4,7 +4,7 @@ from rest_framework.parsers import JSONParser
 from .models import ListaCompra, ItemCompra
 from apps.Users.models import Students
 from apps.products.models import Product
-from .serializers import CompraSerializer, CompraListSerializer, CompraEstudiantilSerializer, ProductSerializer
+from .serializers import CompraSerializer, CompraListSerializer, CompraEstudiantilSerializer, ProductSerializer,ItemOrdenCompraSerializer
 
 
 class ProcesarCompra(generics.CreateAPIView):
@@ -88,3 +88,32 @@ class ComprasEstudiante(generics.ListAPIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+# Listar los item de compra
+class ItemCompraListApiView(generics.ListAPIView):
+    serializer_class = CompraListSerializer
+    queryset = ListaCompra.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        try:
+            queryset = self.get_queryset()
+            serializer = CompraListSerializer(queryset, many=True)
+            serializer_data = [dict(data) for data in serializer.data]
+
+            for data in serializer_data:
+                for product_detail in data['product_detail']:
+                    product_ids = product_detail['products']
+                    products = Product.objects.filter(id=product_ids)
+                    product_detail['products'] = ProductSerializer(products, many=True).data
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+# Listar solo item
+class ListItem(generics.ListAPIView):
+    serializer_class = ItemCompraListApiView
+    queryset = ItemCompra.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = ItemOrdenCompraSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
