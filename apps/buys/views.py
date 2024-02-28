@@ -19,6 +19,7 @@ class ProcesarCompra(generics.CreateAPIView):
             try:
                 codigo = serializer.validated_data['uid']  # Obtengo el codigo de la tarjeta del estudiante del request
                 estudiante = Students.objects.get(uid=codigo)  # se obtiene el estudiante por el codigo de la tarjeta
+                cedula = estudiante.cedula_estudiante
                 if estudiante:
                     total = serializer.validated_data['total']  # Obtenemos el total de la orden de compra
                     if estudiante.balance > total:
@@ -36,13 +37,12 @@ class ProcesarCompra(generics.CreateAPIView):
                                                 status=status.HTTP_400_BAD_REQUEST)
                         restar_saldo = float(estudiante.balance) - float(total)
                         estudiante.balance = restar_saldo
+
                         estudiante.save()
-
-                        orden_compra = ListaCompra.objects.create(uid=codigo, total=total) # Creamos la orden de compra
-
-                        # Recorremos los productos de la orden de compra y restamos el stock
-
-
+                        print("uid", codigo)
+                        print("total", total)
+                        print("cedula", cedula)
+                        orden_compra = ListaCompra.objects.create(uid=codigo, total=total, cedula=cedula)
                         # Recorremos los productos de la orden de compra y los creamos en
                         for producto_data in productos:
                             producto = ItemCompra.objects.create(
@@ -70,8 +70,8 @@ class ComprasEstudiante(generics.ListAPIView):
     serializer_class = CompraEstudiantilSerializer
 
     def get_queryset(self):
-        uid = self.kwargs['uid']
-        return ListaCompra.objects.filter(uid=uid)
+        cedula = self.kwargs['cedula']
+        return ListaCompra.objects.filter(cedula=cedula)
 
     def list(self, request, *args, **kwargs):
         try:

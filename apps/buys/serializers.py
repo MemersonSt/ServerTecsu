@@ -8,8 +8,10 @@ class OrdenCompraSerializer(serializers.ModelSerializer):
         model = ListaCompra
         fields = (
             'id_shopping',
+            'cedula',
             'uid',
             'total',
+
         )
 
 
@@ -21,8 +23,9 @@ class ItemOrdenCompraSerializer(serializers.ModelSerializer):
 
 class CompraSerializer(serializers.Serializer):
     uid = serializers.CharField(max_length=50)
-    product_detail = ItemOrdenCompraSerializer(many=True)
+    product_detail = ItemOrdenCompraSerializer(many=True, required=False)
     total = serializers.DecimalField(max_digits=10, decimal_places=2)
+    cedula = serializers.CharField(max_length=20, required=False)
 
 
 class CompraListSerializer(serializers.ModelSerializer):
@@ -32,7 +35,7 @@ class CompraListSerializer(serializers.ModelSerializer):
         model = ListaCompra
         fields = (
             'id_shopping',
-            'uid',
+            'cedula',
             'total',
             'date',
             'product_detail',
@@ -47,6 +50,7 @@ class ItemCompraEstudiantilSerializer(serializers.ModelSerializer):
 
 class CompraEstudiantilSerializer(serializers.Serializer):
     uid = serializers.CharField(max_length=50)
+    cedula = serializers.CharField(max_length=20)
     product_detail = ItemCompraEstudiantilSerializer(many=True)
     total = serializers.DecimalField(max_digits=10, decimal_places=2)
     date = serializers.DateField()

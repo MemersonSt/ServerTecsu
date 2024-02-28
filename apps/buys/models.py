@@ -5,6 +5,7 @@ from apps.products.models import Product
 class ListaCompra(models.Model):
     id_shopping = models.AutoField(primary_key=True)
     uid = models.CharField(max_length=50)
+    cedula = models.CharField(max_length=20, null=False, blank=False)
     total = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateField(auto_now_add=True)
 
